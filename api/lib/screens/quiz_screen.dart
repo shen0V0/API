@@ -20,7 +20,6 @@ class QuizScreen extends StatefulWidget {
   @override
   _QuizScreenState createState() => _QuizScreenState();
 }
-
 class _QuizScreenState extends State<QuizScreen> {
   List<Question> _questions = [];
   int _currentQuestionIndex = 0;
@@ -31,6 +30,7 @@ class _QuizScreenState extends State<QuizScreen> {
   String _feedbackText = "";
   Timer? _timer;
   int _timeLeft = 10;
+  List<Map<String, dynamic>> _incorrectAnswers = []; // Track incorrect answers
 
   @override
   void initState() {
@@ -74,13 +74,19 @@ class _QuizScreenState extends State<QuizScreen> {
     setState(() {
       _answered = true;
       _selectedAnswer = selectedAnswer;
-      final correctAnswer =
-          _questions[_currentQuestionIndex].correctAnswer;
+      final correctAnswer = _questions[_currentQuestionIndex].correctAnswer;
+
       if (selectedAnswer == correctAnswer) {
         _score++;
         _feedbackText = "Correct! The answer is $correctAnswer.";
       } else {
         _feedbackText = "Incorrect. The correct answer is $correctAnswer.";
+        // Add the incorrect answer details
+        _incorrectAnswers.add({
+          'question': _questions[_currentQuestionIndex].question,
+          'yourAnswer': selectedAnswer.isEmpty ? "No Answer" : selectedAnswer,
+          'correctAnswer': correctAnswer,
+        });
       }
     });
   }
@@ -101,6 +107,7 @@ class _QuizScreenState extends State<QuizScreen> {
           builder: (context) => SummaryScreen(
             score: _score,
             questions: _questions,
+            incorrectAnswers: _incorrectAnswers, // Pass incorrect answers
           ),
         ),
       );
